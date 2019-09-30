@@ -14,7 +14,7 @@ import (
 )
 
 var movies *mongo.Collection
-var pipeline = []bson.M{bson.M{"$sample": bson.M{"size": 1}}}
+var pipeline = []bson.M{{"$sample": bson.M{"size": 1}}}
 
 type Movie struct {
 	ID         primitive.ObjectID `bson:"_id"`
@@ -46,7 +46,7 @@ func initDB() {
 	client, err := mongo.Connect(context.TODO(), opts)
 
 	if err != nil {
-		fmt.Println("db conection error")
+		fmt.Println("db conection error: ", err)
 	}
 
 	db := client.Database(nameDatabase)
@@ -59,7 +59,7 @@ func getRandomMovie() []byte {
 	cursor, err := movies.Aggregate(context.TODO(), pipeline)
 
 	if err != nil {
-		fmt.Println("bad....")
+		fmt.Println("bad: ", err)
 		log.Fatal(err)
 	}
 
@@ -67,13 +67,13 @@ func getRandomMovie() []byte {
 	cursor.Next(context.TODO())
 	// decode the document
 	if err := cursor.Decode(&p); err != nil {
-		fmt.Println("error on decode cursor")
+		fmt.Println("error on decode cursor: ", err)
 		log.Fatal(err)
 	}
 
 	b, err := json.Marshal(p)
 	if err != nil {
-		fmt.Println("error on json parse")
+		fmt.Println("error on json parse: ", err)
 		log.Fatal(err)
 	}
 
